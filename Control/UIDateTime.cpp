@@ -22,6 +22,8 @@ namespace DuiLib
 		void OnFinalMessage(HWND hWnd);
 
 		LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+		void SetDateTimePickerStyle(LONG lStyle);
 	protected:
 		CDateTimeUI* m_pOwner;
 		HBRUSH m_hBkBrush;
@@ -34,6 +36,18 @@ namespace DuiLib
 	{
 	}
 
+	void CDateTimeWnd::SetDateTimePickerStyle(LONG lStyle)
+	{
+		if (0 == lStyle)
+		{
+			return;
+		}
+		LONG dwStyle = GetWindowLong(GetHWND(), GWL_STYLE);
+		dwStyle &= ~DTS_SHORTDATEFORMAT;
+		dwStyle |= lStyle;
+		SetWindowLong(GetHWND(), GWL_STYLE, dwStyle);
+		//SetWindowPos(m_pWindow->GetHWND(), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	}
 	void CDateTimeWnd::Init(CDateTimeUI* pOwner)
 	{
 		m_pOwner = pOwner;
@@ -166,6 +180,7 @@ namespace DuiLib
 		m_nDTUpdateFlag=DT_UPDATE;
 		UpdateText();
 		m_nDTUpdateFlag = DT_NONE;
+		m_lDTPickerStyle = 0;
 	}
 
 	LPCTSTR CDateTimeUI::GetClass() const
@@ -242,6 +257,7 @@ namespace DuiLib
 			if( m_pWindow ) return;
 			m_pWindow = new CDateTimeWnd();
 			ASSERT(m_pWindow);
+			m_pWindow->SetDateTimePickerStyle(m_lDTPickerStyle);
 			m_pWindow->Init(this);
 			m_pWindow->ShowWindow();
 		}
@@ -260,6 +276,7 @@ namespace DuiLib
 				}
 				if( m_pWindow != NULL )
 				{
+					m_pWindow->SetDateTimePickerStyle(m_lDTPickerStyle);
 					m_pWindow->Init(this);
 					m_pWindow->ShowWindow();
 				}
@@ -288,5 +305,20 @@ namespace DuiLib
 		}
 
 		CLabelUI::DoEvent(event);
+	}
+
+	void CDateTimeUI::SetDateTimePickerStyle(LONG lStyle)
+	{
+		m_lDTPickerStyle = lStyle;
+	}
+
+	bool CDateTimeUI::Format(LPCTSTR lpstrFormat)
+	{
+		if (NULL == m_pWindow)
+		{
+			return false;
+		}
+		int nRet = ::SendMessage(m_pWindow->GetHWND(), DTM_SETFORMAT, 0, (LPARAM)lpstrFormat);
+		return nRet != 0;
 	}
 }

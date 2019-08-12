@@ -1,0 +1,5 @@
+/Build
+/.vs/duilib/v15/*.suo
+/.vs/duilib/v15/*.db
+/.vs/duilib/v15/*.opendb
+/.vs/duilib/v15/ipch/*.ipch
