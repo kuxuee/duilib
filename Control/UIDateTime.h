@@ -26,9 +26,9 @@ namespace DuiLib
 		void UpdateText();
 
 		void DoEvent(TEventUI& event);
-		bool Format(LPCTSTR lpstrFormat);
+		void Format(LPCTSTR lpstrFormat);
 		void SetDateTimePickerStyle(LONG lStyle);
-
+		void SetDateTimePickerFormat(LPCTSTR lpstrFormat);
 	protected:
 		SYSTEMTIME m_sysTime;
 		int        m_nDTUpdateFlag;
@@ -36,6 +36,7 @@ namespace DuiLib
 
 		CDateTimeWnd* m_pWindow;
 		LONG	   m_lDTPickerStyle;
+		CDuiString m_strFormat;
 	};
 }
 #endif // __UIDATETIME_H__

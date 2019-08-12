@@ -24,30 +24,32 @@ namespace DuiLib
 		LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		void SetDateTimePickerStyle(LONG lStyle);
+		void SetDateTimePickerFormat(LPCTSTR lpstrFormat);
 	protected:
 		CDateTimeUI* m_pOwner;
 		HBRUSH m_hBkBrush;
 		bool m_bInit;
 		bool m_bDropOpen;
 		SYSTEMTIME m_oldSysTime;
+		LONG m_lStyle;
+		CDuiString m_strFormat;
 	};
 
 	CDateTimeWnd::CDateTimeWnd() : m_pOwner(NULL), m_hBkBrush(NULL), m_bInit(false), m_bDropOpen(false)
 	{
+		m_lStyle = 0;
 	}
 
 	void CDateTimeWnd::SetDateTimePickerStyle(LONG lStyle)
 	{
-		if (0 == lStyle)
-		{
-			return;
-		}
-		LONG dwStyle = GetWindowLong(GetHWND(), GWL_STYLE);
-		dwStyle &= ~DTS_SHORTDATEFORMAT;
-		dwStyle |= lStyle;
-		SetWindowLong(GetHWND(), GWL_STYLE, dwStyle);
-		//SetWindowPos(m_pWindow->GetHWND(), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+		m_lStyle = lStyle;
 	}
+
+	void CDateTimeWnd::SetDateTimePickerFormat(LPCTSTR lpstrFormat)
+	{
+		m_strFormat = lpstrFormat;
+	}
+
 	void CDateTimeWnd::Init(CDateTimeUI* pOwner)
 	{
 		m_pOwner = pOwner;
@@ -56,9 +58,13 @@ namespace DuiLib
 		if (m_hWnd == NULL)
 		{
 			RECT rcPos = CalPos();
-			UINT uStyle = WS_CHILD;
+			UINT uStyle = WS_CHILD | m_lStyle;
 			Create(m_pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
 			SetWindowFont(m_hWnd, m_pOwner->GetManager()->GetFontInfo(m_pOwner->GetFont())->hFont, TRUE);
+			if (m_strFormat != _T(""))
+			{
+				::SendMessage(m_hWnd, DTM_SETFORMAT, 0, (LPARAM)m_strFormat.GetData());
+			}
 		}
 
 		if (m_pOwner->GetText().IsEmpty()) {
@@ -225,8 +231,16 @@ namespace DuiLib
 			SetText(_T(""));
 		}
 		else if (m_nDTUpdateFlag == DT_UPDATE) {
-			CDuiString sText;
-			sText.SmallFormat(_T("%4d-%02d-%02d"), m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay, m_sysTime.wHour, m_sysTime.wMinute);
+			CDuiString sText = m_strFormat;
+			if (DTS_TIMEFORMAT == m_lDTPickerStyle)
+			{
+				sText.SmallFormat(_T("%2d:%02d:%02d"), m_sysTime.wHour, m_sysTime.wMinute, m_sysTime.wSecond);
+			}
+			else
+			{
+				sText.SmallFormat(_T("%4d-%02d-%02d"), m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay, m_sysTime.wHour, m_sysTime.wMinute);
+			}
+			
 			SetText(sText);
 		}
 	}
@@ -258,6 +272,7 @@ namespace DuiLib
 			m_pWindow = new CDateTimeWnd();
 			ASSERT(m_pWindow);
 			m_pWindow->SetDateTimePickerStyle(m_lDTPickerStyle);
+			m_pWindow->SetDateTimePickerFormat(m_strFormat);
 			m_pWindow->Init(this);
 			m_pWindow->ShowWindow();
 		}
@@ -277,6 +292,7 @@ namespace DuiLib
 				if( m_pWindow != NULL )
 				{
 					m_pWindow->SetDateTimePickerStyle(m_lDTPickerStyle);
+					m_pWindow->SetDateTimePickerFormat(m_strFormat);
 					m_pWindow->Init(this);
 					m_pWindow->ShowWindow();
 				}
@@ -312,13 +328,8 @@ namespace DuiLib
 		m_lDTPickerStyle = lStyle;
 	}
 
-	bool CDateTimeUI::Format(LPCTSTR lpstrFormat)
+	void CDateTimeUI::SetDateTimePickerFormat(LPCTSTR lpstrFormat)
 	{
-		if (NULL == m_pWindow)
-		{
-			return false;
-		}
-		int nRet = ::SendMessage(m_pWindow->GetHWND(), DTM_SETFORMAT, 0, (LPARAM)lpstrFormat);
-		return nRet != 0;
+		m_strFormat = lpstrFormat;
 	}
 }
