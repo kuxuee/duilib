@@ -8,6 +8,61 @@ namespace DuiLib
 		DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK,OnClick)
 	DUI_END_MESSAGE_MAP()
 
+	WindowImplBase::WindowImplBase()
+	{
+		m_ResourceType = UILIB_FILE; // UILIB_RESOURCE; // 
+		m_SkilFolder = TEXT("");
+		m_SkilFile = TEXT("none.xml");
+		m_WindowsClassName = TEXT("WindowImplBase");
+		memset(&m_ParentRect, 0, sizeof(RECT));
+	}
+
+	WindowImplBase::~WindowImplBase()
+	{
+	}
+
+	void WindowImplBase::InitResource()
+	{
+	}
+
+	void WindowImplBase::InitWindow()
+	{
+	}
+
+	void WindowImplBase::OnPrepare() 
+	{ 
+	}
+
+	LPCTSTR WindowImplBase::GetManagerName() 
+	{ 
+		return NULL; 
+	}
+
+	LPCTSTR WindowImplBase::GetResourceID() const 
+	{
+		return _T("");
+	}
+
+	CDuiString WindowImplBase::GetZIPFileName() const
+	{
+		return _T("");
+	}
+
+	UILIB_RESTYPE WindowImplBase::GetResourceType() const 
+	{
+		return m_ResourceType;
+	}
+
+	CDuiString WindowImplBase::GetSkinFolder() 
+	{
+		return m_SkilFolder;
+	};
+
+	CDuiString WindowImplBase::GetSkinFile() 
+	{
+		return m_SkilFile;
+	};
+
 	void WindowImplBase::OnFinalMessage( HWND hWnd )
 	{
 		m_pm.RemovePreMessageFilter(this);

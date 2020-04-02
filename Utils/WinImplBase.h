@@ -15,22 +15,16 @@ namespace DuiLib
 		, public IQueryControlText
 	{
 	public:
-		WindowImplBase() {
-            m_ResourceType = UILIB_FILE; // UILIB_RESOURCE; // 
-            m_SkilFolder = TEXT("");
-            m_SkilFile = TEXT("none.xml");
-            m_WindowsClassName = TEXT("WindowImplBase");
-            memset(&m_ParentRect, 0, sizeof(RECT));
-        };
-		virtual ~WindowImplBase(){};
+		WindowImplBase();
+		virtual ~WindowImplBase();
 		// 只需主窗口重写（初始化资源与多语言接口）
-		virtual void InitResource(){};
+		virtual void InitResource();
 		// 每个窗口都可以重写
-		virtual void InitWindow(){};
+		virtual void InitWindow();
 		virtual void OnFinalMessage( HWND hWnd );
 		virtual void Notify(TNotifyUI& msg);
 
-        virtual void OnPrepare() { };  //windowinit消息 时调用
+        virtual void OnPrepare();  //windowinit消息 时调用
 
         CDuiString m_SkilFolder, m_SkilFile, m_WindowsClassName; // 资源路劲，以及文件名
         UILIB_RESTYPE m_ResourceType;
@@ -88,24 +82,15 @@ namespace DuiLib
 		virtual BOOL IsInStaticControl(CControlUI *pControl);
 
 	protected:
-        virtual CDuiString GetSkinFile() { 
-            return m_SkilFile; 
-        };
-        virtual CDuiString GetSkinFolder() { 
-            return m_SkilFolder; };
-        virtual UILIB_RESTYPE GetResourceType() const {
-            return m_ResourceType;
-        }
+        virtual CDuiString GetSkinFile();
+		virtual CDuiString GetSkinFolder();
+		virtual UILIB_RESTYPE GetResourceType() const;
 
-        virtual CDuiString GetZIPFileName() const {
-            return _T("");
-        }
-        virtual LPCTSTR GetResourceID() const {
-            return _T("");
-        }
+		virtual CDuiString GetZIPFileName() const;
+		virtual LPCTSTR GetResourceID() const;
 
 		virtual LPCTSTR GetWindowClassName(void) const = 0 ;
-		virtual LPCTSTR GetManagerName() { return NULL; }
+		virtual LPCTSTR GetManagerName();
 		virtual LRESULT ResponseDefaultKeyEvent(WPARAM wParam);
 		CPaintManagerUI m_pm;
 
